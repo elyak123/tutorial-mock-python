@@ -70,22 +70,42 @@ class SideMainTest(unittest.TestCase):
     def test_main_raises_runtimeerror(self, mock_get, mock_print):
         """
         1.- Descripción de la prueba (test)
+        * La función main de ejemplo_side_effect debe imprimir
+          'This was a mistake' en caso de que exista un RuntimeError
         2.- Requerimientos del entorno (setting)
+        * Hacer un mock de ejemplo.print para evitar ensuciar el stdout
+        * Hacer un mock de ejemplo_side_effect.requests.get
         3.- Inferencias con resultados conocidos
+        * Forzar al mock de ejemplo_side_effect.requests.get para que arroje un RuntimeError
         4.- Evaluación / Assertions
+        * Comprobar que el mock de ejemplo_side_effect.requests.get fue llamado una vez con la url
+          'http://localhost/fake-url/'
+        * Comprobar que ejemplo_side_effect.print fue llamado una vez con el string
+          'This was a mistake'
         """
         mock_get.side_effect = RuntimeError
         with self.assertRaises(RuntimeError):
             side_main()
-        mock_get.assert_called_with('http://localhost/fake-url/')
+        mock_get.assert_called_once_with('http://localhost/fake-url/')
         mock_print.assert_called_with('This was a mistake')
 
     def test_main_returns_200(self, mock_get, mock_print):
         """
         1.- Descripción de la prueba (test)
+        * La funcion main de ejemplo_side_effect, debe realizar la peticion a
+          la url 'http://localhost/fake-url/' en formato json en caso de ser exitosa
         2.- Requerimientos del entorno (setting)
+        * Hacer un mock de ejemplo.print para evitar ensuciar el stdout
+        * Hacer un mock de ejemplo_side_effect.requests.get
+        * Hacer un mock del metodo json del objeto response
         3.- Inferencias con resultados conocidos
+        * Forzar al objeto de retorno del método json a regresar {'hola': 'foo bar'}
+          en formato JSON
+        * Adjuntar el objeto de retorno anterior al mock de respone
+        * Adjuntar el objeto response al mock de requests.get
         4.- Evaluación / Assertions
+        * Comprobar que la funcion builtin side_effect.print fue llamado con
+          {'hola': 'foo bar'} en formato JSON
         """
         attrs = {'json.return_value': json.dumps({'hola': 'foo bar'})}
         mock_response = mock.MagicMock()
